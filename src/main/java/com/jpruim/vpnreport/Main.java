@@ -140,5 +140,9 @@ public class Main {
             if (writer != null) writer.close();
         }
 
+        //Also email. Sorta. This may not work.
+        String datetime = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(Calendar.getInstance().getTime());
+        EmailSender.SendEmail("to@email", "from@email", "mail.server", htmlFile.toString(), "VPN Report - " + datetime);
+
     }
 }
