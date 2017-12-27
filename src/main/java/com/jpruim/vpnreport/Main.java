@@ -130,8 +130,8 @@ public class Main {
         }
         htmlFile.append("</body>\n</html>");
         System.out.println("Parsed " + records + " entries, Found " + sessions +  " sessions from " + uq.length + " users.");
-
-        File file = new File("report.html");
+        String datetime = new SimpleDateFormat("MM-dd-yyyy-HHmmss").format(Calendar.getInstance().getTime());
+        File file = new File("report-" + datetime + ".html");
         BufferedWriter writer = null;
         try {
             writer = new BufferedWriter(new FileWriter(file));
@@ -141,8 +141,8 @@ public class Main {
         }
 
         //Also email. Sorta. This may not work.
-        String datetime = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(Calendar.getInstance().getTime());
-        EmailSender.SendEmail("to@email", "from@email", "mail.server", htmlFile.toString(), "VPN Report - " + datetime);
+        //String datetime = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(Calendar.getInstance().getTime());
+        //EmailSender.SendEmail("to@email", "from@email", "mail.server", htmlFile.toString(), "VPN Report - " + datetime);
 
     }
 }
