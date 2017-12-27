@@ -97,7 +97,8 @@ public class Main {
         }
         StringBuilder htmlFile = new StringBuilder();
         //Eventually I'll use a templating engine. Not today.
-        htmlFile.append("<!doctype html>\n<html>\n<head>\n<title>VPN Report</title>\n</head>\n<body>\n<h1>VPN Use Report</h1>\n<hr />\n<pre>Generated on ")
+        htmlFile.append("<!doctype html>\n<html>\n<head>\n<title>VPN Report</title>\n</head>\n")
+                .append("<body>\n<h1>VPN Use Report</h1>\n<hr />\n<pre>Generated on ")
                 .append(new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(Calendar.getInstance().getTime()))
                 .append(" from file ")
                 .append(args[0])
