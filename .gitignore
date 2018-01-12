@@ -35,6 +35,9 @@ cmake-build-release/
 out/
 target/
 
+# Maven
+target/
+
 # mpeltonen/sbt-idea plugin
 .idea_modules/
 

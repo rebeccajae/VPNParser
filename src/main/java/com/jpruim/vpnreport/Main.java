@@ -10,6 +10,7 @@ import org.joda.time.format.DateTimeFormatter;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -18,7 +19,6 @@ import java.util.stream.Collectors;
 Work Timeline
 Saturday, December 23 - 2 hours.
 Implemented loading and sorting. It can read the file and put it into a useful form.
-
 Sunday, December 24 - 4 hours.
 Implemented time tallying, export text report.
 Monday, December 25 - 3 hours.
@@ -66,7 +66,10 @@ public class Main {
         String[] uq = temp.toArray(new String[temp.size()]);
         HashMap<String, List> arrayOfStuff = new HashMap<>();
         for (String user:uq) {
-            List<Event> thisEvents = entries.stream().filter(c -> c.user.equals(user)).sorted(Comparator.comparingLong(o -> o.dt.getMillis())).collect(Collectors.toList());
+            List<Event> thisEvents = entries.stream()
+                    .filter(c -> c.user.equals(user))
+                    .sorted(Comparator.comparingLong(o -> o.dt.getMillis()))
+                    .collect(Collectors.toList());
             List<Session> userSessions = new ArrayList<>();
             StringBuilder sb = new StringBuilder();
             for(Event e : thisEvents) {
@@ -93,7 +96,13 @@ public class Main {
 
         }
         StringBuilder htmlFile = new StringBuilder();
-        htmlFile.append("<!doctype html>\n<html>\n<head>\n<title>VPN Report</title>\n</head>\n<body>\n<h1>VPN Use Report</h1>\n<hr />\n<br />\n");
+        //Eventually I'll use a templating engine. Not today.
+        htmlFile.append("<!doctype html>\n<html>\n<head>\n<title>VPN Report</title>\n</head>\n")
+                .append("<body>\n<h1>VPN Use Report</h1>\n<hr />\n<pre>Generated on ")
+                .append(new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(Calendar.getInstance().getTime()))
+                .append(" from file ")
+                .append(args[0])
+                .append("</pre>\n<br />\n");
         for(Map.Entry<String, List> entry : arrayOfStuff.entrySet()) {
             String key = entry.getKey();
             List<Session> value = entry.getValue();
@@ -117,11 +126,33 @@ public class Main {
                 htmlFile.append("</table>\n<br />\n");
                 htmlFile.append("Total Time (Minutes, Rounded) - ").append(timeSum / 60).append("\n<hr />\n");
             }
+            htmlFile.append("<h2>User ")
+                    .append(key)
+                    .append("</h2>\n");
+            htmlFile.append("<table style=\"width:100%\">\n" +
+                    "<tr>\n" +
+                    "<th align=\"left\">Time Started</th>\n" +
+                    "<th align=\"left\">Time Ended</th>\n" +
+                    "<th align=\"left\">Duration (Minutes, Rounded)</th>\n" +
+                    "</tr>\n");
+            int timeSum = 0;
+            for (Session e: value) {
+                htmlFile.append("<tr>\n")
+                        .append("<td>").append(e.start.dt.toString("MM/dd/yyyy HH:mm:ss")).append("</td>\n")
+                        .append("<td>").append(e.end.dt.toString("MM/dd/yyyy HH:mm:ss")).append("</td>\n")
+                        .append("<td>").append(e.getMillisBetween() / (1000 * 60)).append("</td>\n")
+                        .append("</tr>\n");
+                timeSum += e.getMillisBetween()/1000;
+            }
+            htmlFile.append("</table>\n<br />\n");
+            htmlFile.append("Total Time (Minutes, Rounded) - ")
+                    .append(timeSum/60)
+                    .append("\n<hr />\n");
         }
         htmlFile.append("</body>\n</html>");
         System.out.println("Parsed " + records + " entries, Found " + sessions +  " sessions from " + uq.length + " users.");
-
-        File file = new File("report.html");
+        String datetime = new SimpleDateFormat("MM-dd-yyyy-HHmmss").format(Calendar.getInstance().getTime());
+        File file = new File("report-" + datetime + ".html");
         BufferedWriter writer = null;
         try {
             writer = new BufferedWriter(new FileWriter(file));
@@ -129,6 +160,10 @@ public class Main {
         } finally {
             if (writer != null) writer.close();
         }
+
+        //Also email. Sorta. This may not work.
+        //String datetime = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss").format(Calendar.getInstance().getTime());
+        //EmailSender.SendEmail("to@email", "from@email", "mail.server", htmlFile.toString(), "VPN Report - " + datetime);
 
     }
 }
