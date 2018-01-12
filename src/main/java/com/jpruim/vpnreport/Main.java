@@ -97,24 +97,26 @@ public class Main {
         for(Map.Entry<String, List> entry : arrayOfStuff.entrySet()) {
             String key = entry.getKey();
             List<Session> value = entry.getValue();
-            htmlFile.append("<h2>User ").append(key).append("</h2>\n");
-            htmlFile.append("<table style=\"width:100%\">\n" +
-                    "<tr>\n" +
-                    "<th align=\"left\">Time Started</th>\n" +
-                    "<th align=\"left\">Time Ended</th>\n" +
-                    "<th align=\"left\">Duration (Minutes, Rounded)</th>\n" +
-                    "</tr>\n");
-            int timeSum = 0;
-            for (Session e: value) {
-                htmlFile.append("<tr>\n")
-                        .append("<td>").append(e.start.dt.toString("MM/dd/yyyy HH:mm:ss")).append("</td>\n")
-                        .append("<td>").append(e.end.dt.toString("MM/dd/yyyy HH:mm:ss")).append("</td>\n")
-                        .append("<td>").append(e.getMillisBetween() / (1000 * 60)).append("</td>\n")
-                        .append("</tr>\n");
-                timeSum += e.getMillisBetween()/1000;
+            if (value.size() > 0){
+                htmlFile.append("<h2>User ").append(key).append("</h2>\n");
+                htmlFile.append("<table style=\"width:100%\">\n" +
+                        "<tr>\n" +
+                        "<th align=\"left\">Time Started</th>\n" +
+                        "<th align=\"left\">Time Ended</th>\n" +
+                        "<th align=\"left\">Duration (Minutes, Rounded)</th>\n" +
+                        "</tr>\n");
+                int timeSum = 0;
+                for (Session e : value) {
+                    htmlFile.append("<tr>\n")
+                            .append("<td>").append(e.start.dt.toString("MM/dd/yyyy HH:mm:ss")).append("</td>\n")
+                            .append("<td>").append(e.end.dt.toString("MM/dd/yyyy HH:mm:ss")).append("</td>\n")
+                            .append("<td>").append(e.getMillisBetween() / (1000 * 60)).append("</td>\n")
+                            .append("</tr>\n");
+                    timeSum += e.getMillisBetween() / 1000;
+                }
+                htmlFile.append("</table>\n<br />\n");
+                htmlFile.append("Total Time (Minutes, Rounded) - ").append(timeSum / 60).append("\n<hr />\n");
             }
-            htmlFile.append("</table>\n<br />\n");
-            htmlFile.append("Total Time (Minutes, Rounded) - ").append(timeSum/60).append("\n<hr />\n");
         }
         htmlFile.append("</body>\n</html>");
         System.out.println("Parsed " + records + " entries, Found " + sessions +  " sessions from " + uq.length + " users.");
